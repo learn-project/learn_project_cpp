@@ -22,11 +22,21 @@ public:
 		cout << "class A func3" << endl;
 		return 2;
 	}
+	
+	static void static_func1(void)
+	{
+		static_val = static_const_val;
+		cout << "class A static_func1,static_val=" << static_val << endl;
+	}
 private:
 	
 protected:
-
+	static int static_val;
+	static const int static_const_val = 10;
+	int value;
 }; 
+int A::static_val = 1;
+
 class B : public A
 {
 public:
@@ -46,6 +56,15 @@ public:
 	{
 		cout << "class B func3" << endl;
 		return 2;
+	}
+	virtual void call_static_func1(const B &b)
+	{
+		cout << "class B call_static_func1" << endl;
+		
+		A::static_func1();
+		B::static_func1();
+		b.static_func1();
+		static_func1();
 	}
 private:
 	
@@ -72,11 +91,34 @@ public:
 		cout << "class C func3" << endl;
 		return 2;
 	}
+	virtual void call_static_func1(const B &b)
+	{
+		cout << "class C call_static_func1" << endl;
+		A::static_func1();
+		B::static_func1();
+		C::static_func1();
+		b.static_func1();
+		static_func1();
+		A::static_val = 1;
+		B::static_val = 1;
+		C::static_val = 1;
+		b.static_val = 1;
+		
+	}
 protected:
 
 private:
 
 };
+class base  
+{  
+public:  
+     static int funA() {return 0;} 
+    int funB(){}
+};  
+int (*pfA)() = &base::funA; //普通的函数指针  
+int (base::*pfB)() = &base::funB; //成员函数指针  
+
 int main()
 {
 	A *pA = new B;
@@ -89,8 +131,12 @@ int main()
 	pB->func();
 	pB->func2();
 	pB->func3();
+	pB->call_static_func1(*pB);
+	
 	
 	delete pA;
 	delete pB;
 	return 0;
 }
+
+
